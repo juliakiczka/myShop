@@ -1,19 +1,23 @@
 package com.example.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-//@Table
-//@Entity
+@Entity
+@NoArgsConstructor
 public class Address {
     @Id
+    @GeneratedValue
     private Long id;
+//    @Column(name = "street")
     private String street;
+//    @Column(name = "city")
     private String city;
+//    @Column(name="zip_code")
     private String zipCode;
-    private Client client;
+//    @OneToOne
+//    private Client client;
 
 }

@@ -1,18 +1,20 @@
 package com.example.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-//@Entity
-//@Table
+@Entity
 @Data
+@NoArgsConstructor
 public class Category {
     @Id
+    @GeneratedValue
     private Long id;
+//    @Column(name = "name")
     private String name;
-    private List<Product> products;
+
+//    private List<Product> products;
 }

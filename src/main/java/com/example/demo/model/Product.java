@@ -1,27 +1,31 @@
 package com.example.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 @Data
-//@Table
-//@Entity
+@Entity
+@NoArgsConstructor
 public class Product {
     @Id
+    @GeneratedValue
     private Long id;
+//    @Column(name = "name")
     private String name;
+//    @Column(name = "cost")
     private BigDecimal cost;
-    private Category category;
-    private List<Order> orders;
+
+//    private Category category;
+
+//    private List<Order> orders;
 }
-//        Onetoone ---- klient – adres
-//
-//        Onetomany ---- klient - zamówienie
-//
-//        Manytoone ---- produkt - kategoria
-//
-//        Manytomany ---- produkt – zamówienie
+////        Onetoone ---- klient – adres
+////
+////        Onetomany ---- klient - zamówienie
+////
+////        Manytoone ---- produkt - kategoria
+////
+////        Manytomany ---- produkt – zamówienie
