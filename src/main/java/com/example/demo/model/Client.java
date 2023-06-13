@@ -16,16 +16,18 @@ public class Client {
 //    @Column(name = "client_id")
     private Long id;
 //    @Column(name = "name")
+
     private String name;
 //    @Column(name = "surname")
     private String surname;
 //    @Column(name = "email")
     private String email;
+
 //    @OneToOne
 //    @JoinColumn(name = "address_id")
 //    private Address address;
 //    @OneToMany(fetch = FetchType.EAGER)
 //    @JoinColumn(name = "orders_id")
-//    private List<Order> orders;
+//    private List<Orders> orders;
 
 }

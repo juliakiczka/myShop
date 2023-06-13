@@ -12,6 +12,7 @@ public class Address {
     @GeneratedValue
     private Long id;
 //    @Column(name = "street")
+
     private String street;
 //    @Column(name = "city")
     private String city;

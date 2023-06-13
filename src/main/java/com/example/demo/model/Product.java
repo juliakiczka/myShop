@@ -20,7 +20,7 @@ public class Product {
 
 //    private Category category;
 
-//    private List<Order> orders;
+//    private List<Orders> orders;
 }
 ////        Onetoone ---- klient – adres
 ////

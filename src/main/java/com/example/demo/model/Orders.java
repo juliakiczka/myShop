@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @Entity
 @NoArgsConstructor
-public class Order {
+public class Orders {
     @Id
     @GeneratedValue
     private Long id;
