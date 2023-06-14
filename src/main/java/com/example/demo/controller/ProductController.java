@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Client;
-import com.example.demo.service.ClientService;
+import com.example.demo.model.Product;
+import com.example.demo.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,45 +13,45 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/clients")
-public class ClientController {
-    private ClientService service;
+@RequestMapping("/products")
+public class ProductController {
+    private ProductService service;
 
 
     @Autowired
-    public ClientController(ClientService service) {
+    public ProductController(ProductService service) {
         this.service = service;
     }
 
     @GetMapping("/getAll")
-    public List<Client> getAll() {
-        return service.getAllClients();
+    public List<Product> getAll() {
+        return service.getAllProducts();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getById(@PathVariable Long id) {
-        final Optional<Client> client = service.getClientById(id);
-        if (client.isPresent()) {
+    public ResponseEntity<Product> getById(@PathVariable Long id) {
+        final Optional<Product> product = service.getProductById(id);
+        if (product.isPresent()) {
             log.info("getting client with id {}", id);
-            return ResponseEntity.ok().body(client.get());
+            return ResponseEntity.ok().body(product.get());
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        if (service.getClientById(id).isEmpty()) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (service.getProductById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
         log.info("deleting client with id {}", id);
-        service.removeClientById(id);
+        service.removeProductById(id);
         return ResponseEntity.noContent().build();
 
     }
 
     @PostMapping
-    public ResponseEntity<Client> post(@RequestBody Client requestClient) {
-        Optional<Client> savedClient = service.saveClient(requestClient);
+    public ResponseEntity<Product> post(@RequestBody Product requestProduct) {
+        Optional<Product> savedClient = service.saveProduct(requestProduct);
         if (savedClient.isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -62,11 +62,11 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Client> update(@PathVariable Long id, @RequestBody Client client) {
-        Optional<Client> updatedClient = service.updateClientById(id, client);
-        if (!updatedClient.isEmpty()) {
+    ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
+        Optional<Product> updatedProduct = service.updateProductById(id, product);
+        if (!updatedProduct.isEmpty()) {
             return ResponseEntity
-                    .ok(updatedClient.get());
+                    .ok(updatedProduct.get());
         }
         return ResponseEntity
                 .notFound()

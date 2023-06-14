@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Client {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    @Column(name = "client_id")
     private Long id;
 //    @Column(name = "name")
