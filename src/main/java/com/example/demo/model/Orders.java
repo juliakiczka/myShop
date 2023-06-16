@@ -13,7 +13,6 @@ public class Orders {
     @Id
     @GeneratedValue
     private Long id;
-//    @Column(name = "orders_date")
     private LocalDate date;
 
 //    private Client client;

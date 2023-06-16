@@ -1,6 +1,10 @@
 package com.example.demo.model;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,14 +15,13 @@ public class Address {
     @Id
     @GeneratedValue
     private Long id;
-//    @Column(name = "street")
-
     private String street;
-//    @Column(name = "city")
     private String city;
-//    @Column(name="zip_code")
     private String zipCode;
-//    @OneToOne
-//    private Client client;
+    @JsonIgnore
+//    @Cascade(CascadeType.PERSIST)
+//    child
+    @OneToOne(mappedBy = "address")
+    private Client client;
 
 }

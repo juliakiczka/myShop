@@ -1,47 +1,71 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Address;
 import com.example.demo.model.Client;
+import com.example.demo.repository.JpaAddressRepository;
 import com.example.demo.repository.JpaClientRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+import static java.rmi.server.LogStream.log;
+
 @Service
+@Slf4j
 public class ClientService {
     @Autowired
-    private JpaClientRepository repository;
-
+    private JpaClientRepository clientRepository;
+    @Autowired
+    private AddressService addressService;
 
     public List<Client> getAllClients() {
-        return repository.findAll();
+        return clientRepository.findAll();
     }
 
     public Optional<Client> saveClient(Client client) {
-        if (client.getId() != null && repository.existsById(client.getId())) {
+        if (client.getId() != null && clientRepository.existsById(client.getId())) {
+            ClientService.log.info("client is not saved (saveClient)");
             return Optional.empty();
         }
-        return Optional.of(repository.save(client));
+        return Optional.of(clientRepository.save(client));
 
     }
 
-
     public Optional<Client> getClientById(Long id) {
-        return repository.findById(id);
+        return clientRepository.findById(id);
     }
 
     public void removeClientById(Long id) {
-        repository.deleteById(id);
+        clientRepository.deleteById(id);
     }
 
     public Optional<Client> updateClientById(Long id, Client client) {
-        if (repository.existsById(id)) {
+        if (clientRepository.existsById(id)) {
             client.setId(id);
-            return Optional.of(repository.save(client));
+            return Optional.of(clientRepository.save(client));
         }
         return Optional.empty();
-
     }
+
+    public Optional<Client> addNewClient(Client client) {
+        if (clientRepository.existsById(client.getId())) {
+            return Optional.of(clientRepository.save(client));
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Client> setAddress(Long clientId, Long addressId) {
+        Optional<Client> optionalClient = clientRepository.findById(clientId);
+        Optional<Address> optionalAddress = addressService.getAddressById(addressId);
+        if (optionalClient.isPresent() && optionalAddress.isPresent()) {
+            Client updatedClient = optionalClient.get();
+            updatedClient.setAddress(optionalAddress.get());
+            return Optional.of(clientRepository.save(updatedClient));
+        }
+        return Optional.empty();
+    }
+
 }

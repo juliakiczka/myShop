@@ -13,7 +13,6 @@ public class Category {
     @Id
     @GeneratedValue
     private Long id;
-//    @Column(name = "name")
     private String name;
 
 //    private List<Product> products;
