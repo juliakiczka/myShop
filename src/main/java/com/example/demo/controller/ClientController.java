@@ -93,4 +93,19 @@ public class ClientController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @PutMapping("/disconnect/{clientId}")
+    public ResponseEntity<Void> disconnectEntities(@PathVariable("clientId") Long clientId) {
+        boolean disconnected = clientService.disconnectEntities(clientId);
+
+        if (disconnected) {
+            log.info("entities disconnected");
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+
+
 }

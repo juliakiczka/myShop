@@ -68,4 +68,25 @@ public class ClientService {
         return Optional.empty();
     }
 
+    public boolean disconnectEntities(Long clientId) {
+        Client client = getClientById(clientId).orElse(null);
+
+        if (client != null) {
+            Address address = client.getAddress();
+
+            if (address != null) {
+                address.setClient(null);
+                client.setAddress(null);
+
+                addressService.save(address);
+                clientRepository.save(client);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
 }
