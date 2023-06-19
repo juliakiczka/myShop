@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.model.Address;
 import com.example.demo.model.Client;
+import com.example.demo.model.Orders;
 import com.example.demo.repository.JpaAddressRepository;
 import com.example.demo.repository.JpaClientRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,8 @@ public class ClientService {
     private JpaClientRepository clientRepository;
     @Autowired
     private AddressService addressService;
+    @Autowired
+    private OrdersService ordersService;
 
     public List<Client> getAllClients() {
         return clientRepository.findAll();
@@ -57,6 +60,11 @@ public class ClientService {
         return Optional.empty();
     }
 
+    public List<Client> getClientByName(String name) {
+        return clientRepository.findByName(name);
+    }
+//    address
+
     public Optional<Client> setAddress(Long clientId, Long addressId) {
         Optional<Client> optionalClient = clientRepository.findById(clientId);
         Optional<Address> optionalAddress = addressService.getAddressById(addressId);
@@ -89,4 +97,15 @@ public class ClientService {
     }
 
 
+    //order
+//    public Optional<Client> setOrder(Long clientId, Long orderId) {
+//        Optional<Client> client = clientRepository.findById(clientId);
+//        Optional<Orders> order = ordersService.getOrderById(orderId);
+//        if (client.isPresent() && order.isPresent()) {
+//            Client updatedClient = client.get();
+//            updatedClient.setOrders(List.of(order.get()));
+//            return Optional.of(clientRepository.save(updatedClient));
+//        }
+//        return Optional.empty();
+//    }
 }

@@ -14,8 +14,9 @@ public class Orders {
     @GeneratedValue
     private Long id;
     private LocalDate date;
-
-//    private Client client;
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private Client client;
 
 //    private List<Product> products;
 

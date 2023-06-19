@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -14,12 +16,11 @@ public class Client {
     private String name;
     private String surname;
     private String email;
-    @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "address_id")
     private Address address;
-//    @OneToMany(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "orders_id")
-//    private List<Orders> orders;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "client")
+    private List<Orders> orders;
 
 //          CASE TEST
 //    1)dodanie adresu --- działa

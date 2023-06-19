@@ -19,7 +19,6 @@ public class Address {
     private String city;
     private String zipCode;
     @JsonIgnore
-//    @Cascade(CascadeType.PERSIST)
 //    child
     @OneToOne(mappedBy = "address")
     private Client client;
