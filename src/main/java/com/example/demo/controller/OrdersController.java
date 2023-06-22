@@ -68,17 +68,17 @@ public class OrdersController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
     }
-
-    @PutMapping("/{id}")
-    ResponseEntity<Orders> update(@PathVariable Long id, @RequestBody Orders order) {
-        Optional<Orders> updatedorder = service.updateOrderById(id, order);
-        if (!updatedorder.isEmpty()) {
-            return ResponseEntity
-                    .ok(updatedorder.get());
-        }
-        return ResponseEntity
-                .notFound()
-                .build();
-
-    }
+//napraw
+//    @PutMapping("/{id}")
+//    ResponseEntity<Orders> update(@PathVariable Long id, @RequestBody Orders order) {
+//        Optional<Orders> updatedorder = service.updateOrderById(id, order);
+//        if (!updatedorder.isEmpty()) {
+//            return ResponseEntity
+//                    .ok(updatedorder.get());
+//        }
+//        return ResponseEntity
+//                .notFound()
+//                .build();
+//
+//    }
 }

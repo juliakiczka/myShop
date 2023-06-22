@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.model.Client;
 import com.example.demo.model.Orders;
+import com.example.demo.model.Product;
 import com.example.demo.repository.JpaOrdersRepository;
 import jakarta.persistence.criteria.Order;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +35,15 @@ public class OrdersService {
         repository.deleteById(id);
     }
 
-    public Optional<Orders> updateOrderById(Long id, Orders order) {
-        if (repository.existsById(id)) {
-            order.setId(id);
-            return Optional.of(repository.save(order));
-        }
-        return Optional.empty();
-
-    }
-
+//    public Optional<Orders> setProduct(Long orderId, Long productId) {
+//        Optional<Orders> product = repository.findById(productId);
+//        Optional<Orders> orders = repository.findById(orderId);
+//        if (product.isPresent() && orders.isPresent()) {
+//            product.get().addOrder(orders.get());
+//            repository.save(product.get());
+//            return product;
+//        }
+//        return Optional.empty();
+//    }
 
 }

@@ -5,7 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-
+//parent addressu
+//child orderu
 @Data
 @Entity
 @NoArgsConstructor
@@ -19,15 +20,19 @@ public class Client {
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "address_id")
     private Address address;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "client")
+    @OneToMany(mappedBy = "client", cascade = CascadeType.REMOVE)
+//    @JoinColumn(name = "orders_id")
     private List<Orders> orders;
 
 //          CASE TEST
-//    1)dodanie adresu --- działa
-//    2)dodanie klienta --- działa
-//    3)przypisanie adresu dla klienta --- działa
-//    4)zamiana adresu dla klienta --- na patchu adres się nadpisuje
-//    5)usunięcie adresu, który ma klienta --- nie chce się usunąć
-//    5)usunięcie klienta, który ma adres --- usuwa klienta wraz z adresem
-
+//    1)dodanie orderu ---
+//    2)dodanie klienta ---
+//    3)przypisanie orderu dla klienta --- działa!
+//    4)zamiana orderu dla klienta --- metoda changeOrder
+//    5)usunięcie orderu, który ma klienta --- usuwa sie order a klient zostaje
+//    5)usunięcie klienta, który ma order --- kiedy usuwam klienta to order też sie usuwa
+//
 }
+
+//patch order dla product
+//    patch product dla order

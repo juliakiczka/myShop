@@ -73,4 +73,14 @@ public class ProductController {
                 .build();
 
     }
+
+    @PatchMapping("/{productId}/{orderId}")
+    ResponseEntity<Product> patchProductWithOrder(@PathVariable("productId") Long productId, @PathVariable("orderId") Long orderId) {
+        Optional<Product> product = service.setOrders(productId, orderId);
+        if (product.isPresent()) {
+//            log.info("produkt = {}", product);
+            return ResponseEntity.status(HttpStatus.CREATED).body(product.get());
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
