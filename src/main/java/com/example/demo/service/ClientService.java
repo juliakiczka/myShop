@@ -3,13 +3,10 @@ package com.example.demo.service;
 import com.example.demo.handler.ResourceNotFoundException;
 import com.example.demo.model.Address;
 import com.example.demo.model.Client;
-import com.example.demo.model.Orders;
+import com.example.demo.model.Purchase;
 import com.example.demo.repository.JpaClientRepository;
-import com.example.demo.repository.JpaOrdersRepository;
-import jakarta.persistence.EntityManager;
+import com.example.demo.repository.JpaPurchaseRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +19,7 @@ public class ClientService {
     @Autowired
     private JpaClientRepository clientRepository;
     @Autowired
-    private JpaOrdersRepository ordersRepository;
+    private JpaPurchaseRepository purchaseRepository;
     @Autowired
     private AddressService addressService;
 
@@ -102,35 +99,36 @@ public class ClientService {
     }
 
 
-    //order
-    public Optional<Orders> setOrder(Long clientId, Long orderId) {
+    //purchase
+    public Optional<Purchase> setPurchase(Long clientId, Long purchaseId) {
         Optional<Client> client = clientRepository.findById(clientId);
-        Optional<Orders> order = ordersRepository.findById(orderId);
-        if (client.isPresent() && order.isPresent()) {
-            order.get().setClient(client.get());
-            return Optional.of(ordersRepository.save(order.get()));
+        Optional<Purchase> purchase = purchaseRepository.findById(purchaseId);
+        if (client.isPresent() && purchase.isPresent()) {
+            purchase.get().setClient(client.get());
+            return Optional.of(purchaseRepository.save(purchase.get()));
         }
         return Optional.empty();
     }
 
-    public boolean disconnectEntitiesClientOrder(Long orderId) {
-        Orders orders = ordersRepository.findById(orderId).orElse(null);
-        if (orders != null) {
-            Client client = orders.getClient();
+    public void disconnectEntitiesClientPurchase(Long purchaseId) {
+        Purchase purchase = purchaseRepository.findById(purchaseId).orElse(null);
+        if (purchase != null) {
+            Client client = purchase.getClient();
             if (client != null) {
-                client.setOrders(null);
-                orders.setClient(null);
-                ordersRepository.save(orders);
+                client.setPurchases(null);
+                purchase.setClient(null);
+                purchaseRepository.save(purchase);
                 clientRepository.save(client);
-                return true;
             }
+        } else {
+            throw new ResourceNotFoundException("Purchase not found with ID: " + purchaseId);
         }
-        return false;
+
     }
 
     //    public boolean changeOrder(Long orderId, Long clientId) {
 //        if (disconnectEntitiesClientOrder(orderId)) {
-//            Optional<Orders> optional = setOrder(clientId, orderId);
+//            Optional<Purchase> optional = setOrder(clientId, orderId);
 //            return optional.isPresent();
 //        }
 //        return false;
@@ -149,19 +147,17 @@ public class ClientService {
                 addressService.save(address);
             }
 
-            List<Orders> orders = client.get().getOrders();
-            if (orders != null) {
-                for (Orders order : orders) {
+            List<Purchase> purchase = client.get().getPurchases();
+            if (purchase != null) {
+                for (Purchase order : purchase) {
                     order.setClient(null);
-                    ordersRepository.save(order);
+                    purchaseRepository.save(order);
                 }
-                client.get().setOrders(null);
+                client.get().setPurchases(null);
                 clientRepository.save(client.get());
             }
         } else {
             throw new ResourceNotFoundException("Client not found with ID: " + clientId);
         }
     }
-
-
 }

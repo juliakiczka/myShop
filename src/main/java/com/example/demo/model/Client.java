@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+
 //parent addressu
 //child orderu
 @Data
@@ -21,8 +22,7 @@ public class Client {
     @JoinColumn(name = "address_id")
     private Address address;
     @OneToMany(mappedBy = "client", cascade = CascadeType.REMOVE)
-//    @JoinColumn(name = "orders_id")
-    private List<Orders> orders;
+    private List<Purchase> purchases;
 
 //          CASE TEST
 //    1)dodanie orderu ---
@@ -32,7 +32,6 @@ public class Client {
 //    5)usunięcie orderu, który ma klienta --- usuwa sie order a klient zostaje
 //    5)usunięcie klienta, który ma order --- kiedy usuwam klienta to order też sie usuwa
 //
+
 }
 
-//patch order dla product
-//    patch product dla order

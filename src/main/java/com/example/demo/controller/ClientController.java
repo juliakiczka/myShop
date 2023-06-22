@@ -1,9 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.handler.ResourceNotFoundException;
 import com.example.demo.model.Address;
 import com.example.demo.model.Client;
-import com.example.demo.model.Orders;
+import com.example.demo.model.Purchase;
 import com.example.demo.service.AddressService;
 import com.example.demo.service.ClientService;
 import lombok.extern.slf4j.Slf4j;
@@ -92,7 +91,7 @@ public class ClientController {
     }
 
     //      address
-    @PatchMapping("/{clientId}/{addressId}")
+    @PatchMapping("/{clientId}/connectWithAddress/{addressId}")
     public ResponseEntity<Client> patchClientWithAddress(@PathVariable("clientId") Long clientId, @PathVariable("addressId") Long addressId) {
         Optional<Client> clientOptional = clientService.setAddress(clientId, addressId);
         if (clientOptional.isPresent()) {
@@ -103,7 +102,7 @@ public class ClientController {
     }
 
 
-    @PatchMapping("/disconnect/{clientId}")
+    @PatchMapping("/disconnectWithAddress/{clientId}")
     public ResponseEntity<Void> disconnectWithAddress(@PathVariable("clientId") Long clientId) {
         boolean disconnected = clientService.disconnectEntitiesClientAddress(clientId);
 
@@ -114,76 +113,20 @@ public class ClientController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/addresses/getAll")
-    public List<Address> getAllAddresses() {
-        return addressService.getAllAddresses();
+    //          purchases
+    @PatchMapping("/{clientId}/connectWithPurchase/{purchaseId}")
+    public ResponseEntity<Purchase> patchClientWithPurchase(@PathVariable("clientId") Long clientId, @PathVariable("purchaseId") Long purchaseId) {
+        Optional<Purchase> purchase = clientService.setPurchase(clientId, purchaseId);
+        if (purchase.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(purchase.get());
+        }
+        return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/addresses/{id}")
-    public ResponseEntity<Address> getAddressById(@PathVariable Long id) {
-        final Optional<Address> address = addressService.getAddressById(id);
-        if (address.isPresent()) {
-            log.info("getting address with id {}", id);
-            return ResponseEntity.ok().body(address.get());
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-
-    @DeleteMapping("/addresses/{id}")
-    public ResponseEntity<Void> deleteAddressById(@PathVariable Long id) {
-        if (addressService.getAddressById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        if (addressService.getAddressById(id).get().getClient() != null) {
-            clientService.disconnectEntitiesClientAddress(addressService.getAddressById(id).get().getClient().getId());
-        }
-        log.info("deleting address with id {}", id);
-        addressService.removeAddressById(id);
+    @PatchMapping("/disconnectWithPurchase/{purchaseId}")
+    public ResponseEntity<Void> disconnectWithPurchases(@PathVariable("purchaseId") Long purchaseId) {
+        clientService.disconnectEntitiesClientPurchase(purchaseId);
         return ResponseEntity.ok().build();
-
-    }
-
-    @PostMapping("/addresses")
-    public ResponseEntity<Address> postAddress(@RequestBody Address requestAddress) {
-        Optional<Address> savedAddress = addressService.saveAddress(requestAddress);
-        if (savedAddress.isPresent()) {
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(savedAddress.get());
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-
-    }
-
-    @PutMapping("/addresses/{id}")
-    ResponseEntity<Address> updateAddress(@PathVariable Long id, @RequestBody Address address) {
-        Optional<Address> updatedAddress = addressService.updateAddressById(id, address);
-        if (!updatedAddress.isEmpty()) {
-            return ResponseEntity
-                    .ok(updatedAddress.get());
-        }
-        return ResponseEntity
-                .notFound()
-                .build();
-    }
-
-    //          orders
-    @PatchMapping("/orders/{clientId}/{orderId}")
-    public ResponseEntity<Orders> patchClientWithOrder(@PathVariable("clientId") Long clientId, @PathVariable("orderId") Long orderId) {
-        Optional<Orders> order = clientService.setOrder(clientId, orderId);
-        if (order.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(order.get());
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-    @PatchMapping("/orders/disconnect/{orderId}")
-    public ResponseEntity<Void> disconnectWithOrders(@PathVariable("orderId") Long orderId) {
-        boolean disconnected = clientService.disconnectEntitiesClientOrder(orderId);
-        if (disconnected) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
     }
 
     //    @PatchMapping("/orders/changeOrder/{orderId}/{clientId}")
@@ -195,12 +138,11 @@ public class ClientController {
 //        return ResponseEntity.notFound().build();
 //    }
 
-    @PatchMapping("/disconnectAll/{clientId}")
+    @PatchMapping("/disconnectWithAll/{clientId}")
     public ResponseEntity<Void> disconnectWithAll(@PathVariable("clientId") Long clientId) {
         clientService.disconnectWithAllEntities(clientId);
         return ResponseEntity.noContent().build();
-
-//        zamień statusy notFound() na ten wyjątek
+//        zamień statusy notFound() na wyjątek
 //        throw new ResourceNotFoundException("Client not found with ID: " + clientId);
     }
 

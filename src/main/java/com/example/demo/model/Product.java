@@ -3,7 +3,6 @@ package com.example.demo.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,22 +16,18 @@ public class Product {
     private Long id;
     private String name;
     private BigDecimal cost;
-
-    //    private Category category;
-//    @ManyToMany(mappedBy = "products", cascade = CascadeType.MERGE)
-
     @ManyToMany(cascade = CascadeType.MERGE)
-    @JoinTable(name = "orders_product",
+    @JoinTable(name = "purchase_product",
             joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "orders_id"))
-    private List<Orders> orders;
+            inverseJoinColumns = @JoinColumn(name = "purchase_id"))
+    private List<Purchase> orders;
 
-    public void addOrder(Orders order) {
-        this.orders.add(order);
+    public void addOrder(Purchase purchase) {
+        this.orders.add(purchase);
     }
 
-    public void removeOrder(Orders order) {
-        this.orders.remove(order);
+    public void removeOrder(Purchase purchase) {
+        this.orders.remove(purchase);
     }
 }
 ////        Onetoone ---- klient – adres

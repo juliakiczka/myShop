@@ -1,8 +1,8 @@
 package com.example.demo.service;
 
-import com.example.demo.model.Orders;
+import com.example.demo.model.Purchase;
 import com.example.demo.model.Product;
-import com.example.demo.repository.JpaOrdersRepository;
+import com.example.demo.repository.JpaPurchaseRepository;
 import com.example.demo.repository.JpaProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class ProductService {
     private JpaProductRepository repository;
 
     @Autowired
-    private JpaOrdersRepository ordersRepository;
+    private JpaPurchaseRepository ordersRepository;
 
     public List<Product> getAllProducts() {
         return repository.findAll();
@@ -50,7 +50,7 @@ public class ProductService {
 //      orders
     public Optional<Product> setOrders(Long productId, Long orderId) {
         Optional<Product> product = repository.findById(productId);
-        Optional<Orders> orders = ordersRepository.findById(orderId);
+        Optional<Purchase> orders = ordersRepository.findById(orderId);
         if (product.isPresent() && orders.isPresent()) {
             product.get().addOrder(orders.get());
             repository.save(product.get());

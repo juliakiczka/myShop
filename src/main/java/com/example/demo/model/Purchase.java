@@ -13,7 +13,8 @@ import java.util.List;
 @Data
 @Entity
 @NoArgsConstructor
-public class Orders {
+public class Purchase
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,8 +25,8 @@ public class Orders {
     private Client client;
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.MERGE)
-    @JoinTable(name = "orders_product",
-            joinColumns = @JoinColumn(name = "orders_id"),
+    @JoinTable(name = "purchase_product",
+            joinColumns = @JoinColumn(name = "purchase_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id"))
     private List<Product> products;
 
@@ -41,7 +42,4 @@ public class Orders {
         this.products.add(product);
     }
 
-    public void removeProduct(Product product) {
-        this.products.remove(product);
-    }
 }

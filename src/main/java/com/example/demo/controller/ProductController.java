@@ -15,22 +15,22 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-    private ProductService service;
+    private ProductService productService;
 
 
     @Autowired
-    public ProductController(ProductService service) {
-        this.service = service;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
     @GetMapping("/getAll")
     public List<Product> getAll() {
-        return service.getAllProducts();
+        return productService.getAllProducts();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getById(@PathVariable Long id) {
-        final Optional<Product> product = service.getProductById(id);
+        final Optional<Product> product = productService.getProductById(id);
         if (product.isPresent()) {
             log.info("getting client with id {}", id);
             return ResponseEntity.ok().body(product.get());
@@ -40,18 +40,18 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (service.getProductById(id).isEmpty()) {
+        if (productService.getProductById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        log.info("deleting client with id {}", id);
-        service.removeProductById(id);
+
+        productService.removeProductById(id);
         return ResponseEntity.noContent().build();
 
     }
 
     @PostMapping
-    public ResponseEntity<Product> post(@RequestBody Product requestProduct) {
-        Optional<Product> savedClient = service.saveProduct(requestProduct);
+    public ResponseEntity<Product> post(@RequestBody Product product) {
+        Optional<Product> savedClient = productService.saveProduct(product);
         if (savedClient.isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -63,7 +63,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
-        Optional<Product> updatedProduct = service.updateProductById(id, product);
+        Optional<Product> updatedProduct = productService.updateProductById(id, product);
         if (!updatedProduct.isEmpty()) {
             return ResponseEntity
                     .ok(updatedProduct.get());
@@ -74,11 +74,11 @@ public class ProductController {
 
     }
 
-    @PatchMapping("/{productId}/{orderId}")
-    ResponseEntity<Product> patchProductWithOrder(@PathVariable("productId") Long productId, @PathVariable("orderId") Long orderId) {
-        Optional<Product> product = service.setOrders(productId, orderId);
+    //  popraw endpointy
+    @PatchMapping("/{productId}/connectWithPurchase/{purchaseId}")
+    ResponseEntity<Product> patchProductWithPurchase(@PathVariable("productId") Long productId, @PathVariable("purchaseId") Long purchaseId) {
+        Optional<Product> product = productService.setOrders(productId, purchaseId);
         if (product.isPresent()) {
-//            log.info("produkt = {}", product);
             return ResponseEntity.status(HttpStatus.CREATED).body(product.get());
         }
         return ResponseEntity.notFound().build();
