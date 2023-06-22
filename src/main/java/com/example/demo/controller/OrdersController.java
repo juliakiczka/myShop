@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Orders;
+import com.example.demo.service.ClientService;
 import com.example.demo.service.OrdersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,13 @@ public class OrdersController {
 
     private OrdersService service;
 
+    private ClientService clientService;
+
 
     @Autowired
-    public OrdersController(OrdersService service) {
+    public OrdersController(OrdersService service, ClientService clientService) {
         this.service = service;
+        this.clientService = clientService;
     }
 
     @GetMapping("/getAll")
@@ -44,9 +48,12 @@ public class OrdersController {
         if (service.getOrderById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        if (service.getOrderById(id).get().getClient() != null) {
+            clientService.disconnectEntitiesClientOrder(service.getOrderById(id).get().getClient().getId());
+        }
         log.info("deleting order with id {}", id);
         service.removeOrderById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
 
     }
 

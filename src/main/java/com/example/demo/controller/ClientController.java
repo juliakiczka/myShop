@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.handler.ResourceNotFoundException;
 import com.example.demo.model.Address;
 import com.example.demo.model.Client;
+import com.example.demo.model.Orders;
 import com.example.demo.service.AddressService;
 import com.example.demo.service.ClientService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+//UPORZĄDKOWAĆ ENDPOINTY (PORZĄDEK TAK JAK W KATALOGACH NA KOMPIE)
 @Slf4j
 @RestController
 @RequestMapping("/clients")
@@ -101,12 +104,11 @@ public class ClientController {
 
 
     @PatchMapping("/disconnect/{clientId}")
-    public ResponseEntity<Void> disconnectEntities(@PathVariable("clientId") Long clientId) {
-        boolean disconnected = clientService.disconnectEntities(clientId);
+    public ResponseEntity<Void> disconnectWithAddress(@PathVariable("clientId") Long clientId) {
+        boolean disconnected = clientService.disconnectEntitiesClientAddress(clientId);
 
         if (disconnected) {
-            log.info("entities disconnected");
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok().build();
         }
 
         return ResponseEntity.notFound().build();
@@ -133,11 +135,11 @@ public class ClientController {
             return ResponseEntity.notFound().build();
         }
         if (addressService.getAddressById(id).get().getClient() != null) {
-            clientService.disconnectEntities(addressService.getAddressById(id).get().getClient().getId());
+            clientService.disconnectEntitiesClientAddress(addressService.getAddressById(id).get().getClient().getId());
         }
         log.info("deleting address with id {}", id);
         addressService.removeAddressById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
 
     }
 
@@ -166,15 +168,41 @@ public class ClientController {
     }
 
     //          orders
-//    @PatchMapping("/orders/{clientId}/{orderId}")
-//    public ResponseEntity<Client> patchClientWithOrder(@PathVariable("clientId") Long clientId, @PathVariable("orderId") Long orderId) {
-//        Optional<Client> clientOptional = clientService.setOrder(clientId, orderId);
-//        if (clientOptional.isPresent()) {
-//            log.info("{} updated", clientOptional);
-//            return ResponseEntity.status(HttpStatus.CREATED).body(clientOptional.get());
+    @PatchMapping("/orders/{clientId}/{orderId}")
+    public ResponseEntity<Orders> patchClientWithOrder(@PathVariable("clientId") Long clientId, @PathVariable("orderId") Long orderId) {
+        Optional<Orders> order = clientService.setOrder(clientId, orderId);
+        if (order.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(order.get());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PatchMapping("/orders/disconnect/{orderId}")
+    public ResponseEntity<Void> disconnectWithOrders(@PathVariable("orderId") Long orderId) {
+        boolean disconnected = clientService.disconnectEntitiesClientOrder(orderId);
+        if (disconnected) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    //    @PatchMapping("/orders/changeOrder/{orderId}/{clientId}")
+//    public ResponseEntity<Void> changeOrder(@PathVariable("orderId") Long orderId, @PathVariable("clientId") Long clientId) {
+//        boolean b = clientService.changeOrder(orderId, clientId);
+//        if (b) {
+//            return ResponseEntity.noContent().build();
 //        }
 //        return ResponseEntity.notFound().build();
 //    }
+
+    @PatchMapping("/disconnectAll/{clientId}")
+    public ResponseEntity<Void> disconnectWithAll(@PathVariable("clientId") Long clientId) {
+        clientService.disconnectWithAllEntities(clientId);
+        return ResponseEntity.noContent().build();
+
+//        zamień statusy notFound() na ten wyjątek
+//        throw new ResourceNotFoundException("Client not found with ID: " + clientId);
+    }
 
 
 }

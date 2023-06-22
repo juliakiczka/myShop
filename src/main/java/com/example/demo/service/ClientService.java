@@ -1,18 +1,20 @@
 package com.example.demo.service;
 
+import com.example.demo.handler.ResourceNotFoundException;
 import com.example.demo.model.Address;
 import com.example.demo.model.Client;
 import com.example.demo.model.Orders;
-import com.example.demo.repository.JpaAddressRepository;
 import com.example.demo.repository.JpaClientRepository;
+import com.example.demo.repository.JpaOrdersRepository;
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
-import static java.rmi.server.LogStream.log;
 
 @Service
 @Slf4j
@@ -20,9 +22,9 @@ public class ClientService {
     @Autowired
     private JpaClientRepository clientRepository;
     @Autowired
-    private AddressService addressService;
+    private JpaOrdersRepository ordersRepository;
     @Autowired
-    private OrdersService ordersService;
+    private AddressService addressService;
 
     public List<Client> getAllClients() {
         return clientRepository.findAll();
@@ -61,8 +63,10 @@ public class ClientService {
     }
 
     public List<Client> getClientByName(String name) {
-        return clientRepository.findByName(name);
+        return clientRepository.findAllByNameContaining(name);
     }
+
+
 //    address
 
     public Optional<Client> setAddress(Long clientId, Long addressId) {
@@ -76,7 +80,8 @@ public class ClientService {
         return Optional.empty();
     }
 
-    public boolean disconnectEntities(Long clientId) {
+    //address
+    public boolean disconnectEntitiesClientAddress(Long clientId) {
         Client client = getClientById(clientId).orElse(null);
 
         if (client != null) {
@@ -98,14 +103,65 @@ public class ClientService {
 
 
     //order
-//    public Optional<Client> setOrder(Long clientId, Long orderId) {
-//        Optional<Client> client = clientRepository.findById(clientId);
-//        Optional<Orders> order = ordersService.getOrderById(orderId);
-//        if (client.isPresent() && order.isPresent()) {
-//            Client updatedClient = client.get();
-//            updatedClient.setOrders(List.of(order.get()));
-//            return Optional.of(clientRepository.save(updatedClient));
+    public Optional<Orders> setOrder(Long clientId, Long orderId) {
+        Optional<Client> client = clientRepository.findById(clientId);
+        Optional<Orders> order = ordersRepository.findById(orderId);
+        if (client.isPresent() && order.isPresent()) {
+            order.get().setClient(client.get());
+            return Optional.of(ordersRepository.save(order.get()));
+        }
+        return Optional.empty();
+    }
+
+    public boolean disconnectEntitiesClientOrder(Long orderId) {
+        Orders orders = ordersRepository.findById(orderId).orElse(null);
+        if (orders != null) {
+            Client client = orders.getClient();
+            if (client != null) {
+                client.setOrders(null);
+                orders.setClient(null);
+                ordersRepository.save(orders);
+                clientRepository.save(client);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //    public boolean changeOrder(Long orderId, Long clientId) {
+//        if (disconnectEntitiesClientOrder(orderId)) {
+//            Optional<Orders> optional = setOrder(clientId, orderId);
+//            return optional.isPresent();
 //        }
-//        return Optional.empty();
+//        return false;
 //    }
+
+    //    zamień boolean na void
+//    tutaj rzuć wyjątek a nie w kontrolerze
+    public void disconnectWithAllEntities(Long clientId) {
+        Optional<Client> client = getClientById(clientId);
+        if (client.isPresent()) {
+            Address address = client.get().getAddress();
+            if (address != null) {
+                client.get().setAddress(null);
+                address.setClient(null);
+                clientRepository.save(client.get());
+                addressService.save(address);
+            }
+
+            List<Orders> orders = client.get().getOrders();
+            if (orders != null) {
+                for (Orders order : orders) {
+                    order.setClient(null);
+                    ordersRepository.save(order);
+                }
+                client.get().setOrders(null);
+                clientRepository.save(client.get());
+            }
+        } else {
+            throw new ResourceNotFoundException("Client not found with ID: " + clientId);
+        }
+    }
+
+
 }
