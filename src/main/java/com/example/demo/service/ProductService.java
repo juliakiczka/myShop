@@ -18,7 +18,7 @@ public class ProductService {
     private JpaProductRepository repository;
 
     @Autowired
-    private JpaPurchaseRepository ordersRepository;
+    private JpaPurchaseRepository purchaseRepository;
 
     public List<Product> getAllProducts() {
         return repository.findAll();
@@ -50,7 +50,7 @@ public class ProductService {
 //      orders
     public Optional<Product> setOrders(Long productId, Long orderId) {
         Optional<Product> product = repository.findById(productId);
-        Optional<Purchase> orders = ordersRepository.findById(orderId);
+        Optional<Purchase> orders = purchaseRepository.findById(orderId);
         if (product.isPresent() && orders.isPresent()) {
             product.get().addOrder(orders.get());
             repository.save(product.get());

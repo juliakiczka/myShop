@@ -20,4 +20,10 @@ public class Address {
     @OneToOne(mappedBy = "address")
     private Client client;
 
+    public Address(String street, String city, String zipCode, Client client) {
+        this.street = street;
+        this.city = city;
+        this.zipCode = zipCode;
+        this.client = client;
+    }
 }

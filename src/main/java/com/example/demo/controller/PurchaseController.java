@@ -52,7 +52,7 @@ public class PurchaseController {
             clientService.disconnectEntitiesClientPurchase(purchaseService.getPurchaseById(id).get().getClient().getId());
         }
         log.info("deleting purchase with id {}", id);
-        purchaseService.deletePurchaseById(id);
+        purchaseService.removePurchaseById(id);
         return ResponseEntity.ok().build();
 
     }

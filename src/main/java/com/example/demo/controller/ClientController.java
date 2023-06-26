@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Address;
 import com.example.demo.model.Client;
 import com.example.demo.model.Purchase;
 import com.example.demo.service.AddressService;
@@ -56,8 +55,8 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<Client> post(@RequestBody Client requestClient) {
-        Optional<Client> savedClient = clientService.saveClient(requestClient);
+    public ResponseEntity<Client> post(@RequestBody Client client) {
+        Optional<Client> savedClient = clientService.saveClient(client);
         if (savedClient.isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -68,9 +67,9 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Client> update(@PathVariable Long id, @RequestBody Client client) {
+    public ResponseEntity<Client> update(@PathVariable Long id, @RequestBody Client client) {
         Optional<Client> updatedClient = clientService.updateClientById(id, client);
-        if (!updatedClient.isEmpty()) {
+        if (updatedClient.isPresent()) {
             return ResponseEntity
                     .ok(updatedClient.get());
         }
@@ -104,13 +103,8 @@ public class ClientController {
 
     @PatchMapping("/disconnectWithAddress/{clientId}")
     public ResponseEntity<Void> disconnectWithAddress(@PathVariable("clientId") Long clientId) {
-        boolean disconnected = clientService.disconnectEntitiesClientAddress(clientId);
-
-        if (disconnected) {
-            return ResponseEntity.ok().build();
-        }
-
-        return ResponseEntity.notFound().build();
+        clientService.disconnectEntitiesClientAddress(clientId);
+        return ResponseEntity.ok().build();
     }
 
     //          purchases

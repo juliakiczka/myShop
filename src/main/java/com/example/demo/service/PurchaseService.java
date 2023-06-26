@@ -32,7 +32,7 @@ public class PurchaseService {
         return purchaseRepository.findById(id);
     }
 
-    public void deletePurchaseById(Long id) {
+    public void removePurchaseById(Long id) {
         purchaseRepository.deleteById(id);
     }
 

@@ -20,14 +20,14 @@ public class Product {
     @JoinTable(name = "purchase_product",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "purchase_id"))
-    private List<Purchase> orders;
+    private List<Purchase> purchases;
 
     public void addOrder(Purchase purchase) {
-        this.orders.add(purchase);
+        this.purchases.add(purchase);
     }
 
     public void removeOrder(Purchase purchase) {
-        this.orders.remove(purchase);
+        this.purchases.remove(purchase);
     }
 }
 ////        Onetoone ---- klient – adres

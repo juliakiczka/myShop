@@ -4,6 +4,7 @@ import com.example.demo.handler.ResourceNotFoundException;
 import com.example.demo.model.Address;
 import com.example.demo.model.Client;
 import com.example.demo.model.Purchase;
+import com.example.demo.repository.JpaAddressRepository;
 import com.example.demo.repository.JpaClientRepository;
 import com.example.demo.repository.JpaPurchaseRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +17,20 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class ClientService {
-    @Autowired
+    //    CAŁA LOGIKA JEST W SERWISIE!
+        @Autowired
     private JpaClientRepository clientRepository;
-    @Autowired
+        @Autowired
     private JpaPurchaseRepository purchaseRepository;
-    @Autowired
-    private AddressService addressService;
+        @Autowired
+    private JpaAddressRepository addressRepository;
+
+//    @Autowired
+//    public ClientService(JpaClientRepository clientRepository, JpaPurchaseRepository purchaseRepository, JpaAddressRepository addressRepository) {
+//        this.clientRepository = clientRepository;
+//        this.purchaseRepository = purchaseRepository;
+//        this.addressRepository = addressRepository;
+//    }
 
     public List<Client> getAllClients() {
         return clientRepository.findAll();
@@ -29,7 +38,6 @@ public class ClientService {
 
     public Optional<Client> saveClient(Client client) {
         if (client.getId() != null && clientRepository.existsById(client.getId())) {
-            ClientService.log.info("client is not saved (saveClient)");
             return Optional.empty();
         }
         return Optional.of(clientRepository.save(client));
@@ -52,12 +60,6 @@ public class ClientService {
         return Optional.empty();
     }
 
-    public Optional<Client> addNewClient(Client client) {
-        if (clientRepository.existsById(client.getId())) {
-            return Optional.of(clientRepository.save(client));
-        }
-        return Optional.empty();
-    }
 
     public List<Client> getClientByName(String name) {
         return clientRepository.findAllByNameContaining(name);
@@ -68,7 +70,7 @@ public class ClientService {
 
     public Optional<Client> setAddress(Long clientId, Long addressId) {
         Optional<Client> optionalClient = clientRepository.findById(clientId);
-        Optional<Address> optionalAddress = addressService.getAddressById(addressId);
+        Optional<Address> optionalAddress = addressRepository.findById(addressId);
         if (optionalClient.isPresent() && optionalAddress.isPresent()) {
             Client updatedClient = optionalClient.get();
             updatedClient.setAddress(optionalAddress.get());
@@ -78,7 +80,7 @@ public class ClientService {
     }
 
     //address
-    public boolean disconnectEntitiesClientAddress(Long clientId) {
+    public void disconnectEntitiesClientAddress(Long clientId) {
         Client client = getClientById(clientId).orElse(null);
 
         if (client != null) {
@@ -88,14 +90,12 @@ public class ClientService {
                 address.setClient(null);
                 client.setAddress(null);
 
-                addressService.save(address);
+                addressRepository.save(address);
                 clientRepository.save(client);
-
-                return true;
             }
+        } else {
+            throw new ResourceNotFoundException("Client not found with ID: " + clientId);
         }
-
-        return false;
     }
 
 
@@ -144,7 +144,7 @@ public class ClientService {
                 client.get().setAddress(null);
                 address.setClient(null);
                 clientRepository.save(client.get());
-                addressService.save(address);
+                addressRepository.save(address);
             }
 
             List<Purchase> purchase = client.get().getPurchases();

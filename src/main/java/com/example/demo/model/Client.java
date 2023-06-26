@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,6 +25,13 @@ public class Client {
     @OneToMany(mappedBy = "client", cascade = CascadeType.REMOVE)
     private List<Purchase> purchases;
 
+    public Client(String name, String surname, String email, Address address, List<Purchase> purchases) {
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.address = address;
+        this.purchases = purchases;
+    }
 //          CASE TEST
 //    1)dodanie orderu ---
 //    2)dodanie klienta ---

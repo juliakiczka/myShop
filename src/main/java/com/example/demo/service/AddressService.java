@@ -19,9 +19,6 @@ public class AddressService {
         return repository.findAll();
     }
 
-    public Address save(Address address) {
-        return repository.save(address);
-    }
 
     public Optional<Address> saveAddress(Address address) {
         if (address.getId() != null && repository.existsById(address.getId())) {
