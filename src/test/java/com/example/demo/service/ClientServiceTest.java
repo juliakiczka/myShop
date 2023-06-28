@@ -15,10 +15,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -254,11 +251,10 @@ class ClientServiceTest {
         verify(purchaseRepository, times(1)).save(purchase);
     }
 
-
     @Test
     void disconnectWithAllEntities_clientFound() {
         Long clientId = 1L;
-        Client client = new Client("Jane", "Doe", "j@d.pl", null, anyList());
+        Client client = new Client("Jane", "Doe", "j@d.pl", null, Collections.emptyList());
         Address address = new Address("Nice", "New York", "22-333", null);
         Purchase purchase1 = new Purchase(LocalDateTime.now(), null, null);
         Purchase purchase2 = new Purchase(LocalDateTime.now(), null, null);
@@ -273,14 +269,29 @@ class ClientServiceTest {
 
         clientService.disconnectWithAllEntities(clientId);
 
-        verify(clientRepository, times(1)).save(client);
+        verify(clientRepository, times(2)).save(client);
         verify(addressRepository, times(1)).save(address);
         for (Purchase purchase : purchases) {
-            verify(purchaseRepository, times(1)).save(purchase);
+            verify(purchaseRepository, times(purchases.size())).save(purchase);
             assertNull(purchase.getClient());
         }
         assertNull(client.getAddress());
         assertNull(client.getPurchases());
+    }
+
+
+    @Test
+    void disconnectWithAllEntities_clientNotFound() {
+        Long clientId = 1L;
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            clientService.disconnectWithAllEntities(clientId);
+        });
+
+        verify(clientRepository, times(1)).findById(clientId);
+        verifyNoMoreInteractions(addressRepository, clientRepository, purchaseRepository);
     }
 
 }
