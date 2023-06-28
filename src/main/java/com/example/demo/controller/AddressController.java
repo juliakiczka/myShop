@@ -2,10 +2,12 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Address;
 import com.example.demo.service.AddressService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,7 +52,7 @@ public class AddressController {
     }
 
     @PostMapping
-    public ResponseEntity<Address> post(@RequestBody Address address) {
+    public ResponseEntity<Address> post(@Valid @RequestBody Address address) {
         Optional<Address> savedAddress = addressService.saveAddress(address);
         if (savedAddress.isPresent()) {
             return ResponseEntity
@@ -62,7 +64,7 @@ public class AddressController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Address> update(@PathVariable Long id, @RequestBody Address address) {
+    ResponseEntity<Address> update(@PathVariable Long id, @Valid @RequestBody Address address) {
         Optional<Address> updatedAddress = addressService.updateAddressById(id, address);
         if (!updatedAddress.isEmpty()) {
             return ResponseEntity

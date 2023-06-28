@@ -4,6 +4,7 @@ import com.example.demo.model.Client;
 import com.example.demo.model.Purchase;
 import com.example.demo.service.AddressService;
 import com.example.demo.service.ClientService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,7 +56,7 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<Client> post(@RequestBody Client client) {
+    public ResponseEntity<Client> post(@Valid @RequestBody Client client) {
         Optional<Client> savedClient = clientService.saveClient(client);
         if (savedClient.isPresent()) {
             return ResponseEntity
@@ -67,7 +68,7 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Client> update(@PathVariable Long id, @RequestBody Client client) {
+    public ResponseEntity<Client> update(@PathVariable Long id, @Valid @RequestBody Client client) {
         Optional<Client> updatedClient = clientService.updateClientById(id, client);
         if (updatedClient.isPresent()) {
             return ResponseEntity
@@ -119,7 +120,7 @@ public class ClientController {
 
     @PatchMapping("/disconnectWithPurchase/{purchaseId}")
     public ResponseEntity<Void> disconnectWithPurchases(@PathVariable("purchaseId") Long purchaseId) {
-        clientService.disconnectEntitiesClientPurchase(purchaseId);
+        clientService.disconnectEntitiesPurchaseClient(purchaseId);
         return ResponseEntity.ok().build();
     }
 

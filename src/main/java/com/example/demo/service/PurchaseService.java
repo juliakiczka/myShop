@@ -44,7 +44,7 @@ public class PurchaseService {
         return Optional.empty();
     }
 
-    public Optional<Purchase> setProduct(Long purchaseId, Long productId) {
+    public Optional<Purchase> setProducts(Long purchaseId, Long productId) {
         Optional<Product> product = productRepository.findById(productId);
         Optional<Purchase> purchases = purchaseRepository.findById(purchaseId);
         if (product.isPresent() && purchases.isPresent()) {

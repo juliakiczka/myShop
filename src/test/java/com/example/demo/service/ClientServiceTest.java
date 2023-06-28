@@ -1,10 +1,12 @@
 package com.example.demo.service;
 
+import com.example.demo.handler.ResourceNotFoundException;
+import com.example.demo.model.Address;
 import com.example.demo.model.Client;
+import com.example.demo.model.Purchase;
 import com.example.demo.repository.JpaAddressRepository;
 import com.example.demo.repository.JpaClientRepository;
 import com.example.demo.repository.JpaPurchaseRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,11 +14,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ClientServiceTest {
@@ -45,7 +49,7 @@ class ClientServiceTest {
 
         Optional<Client> savedClient = clientService.saveClient(client);
 
-        Assertions.assertTrue(savedClient.isPresent());
+        assertTrue(savedClient.isPresent());
         assertEquals(client, savedClient.get());
     }
 
@@ -56,7 +60,7 @@ class ClientServiceTest {
 
         Optional<Client> retrievedClient = clientService.getClientById(1L);
 
-        Assertions.assertTrue(retrievedClient.isPresent());
+        assertTrue(retrievedClient.isPresent());
         assertEquals(client, retrievedClient.get());
     }
 
@@ -99,72 +103,185 @@ class ClientServiceTest {
         assertEquals(expectedClients, actualClients);
     }
 
-//    @Test
-//     void setAddress_should_connect_address_to_client() {
-//         Arrange
-//        Long clientId = 1L;
-//        Long addressId = 2L;
-//
-//        Client client = new Client();
-//        Address address = new Address();
-//
-//        when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
-//        when(addressRepository.findById(addressId)).thenReturn(Optional.of(address));
-//        when(clientRepository.save(any(Client.class))).thenReturn(client);
-//
-//         Act
-//        Optional<Client> result = clientService.setAddress(clientId, addressId);
+    @Test
+    void setAddress_should_connect_address_to_client() {
+        Long clientId = 1L;
+        Long addressId = 2L;
 
-    // Assert
-//        assertTrue(result.isPresent());
-//        assertEquals(client, result.get());
-//        assertEquals(address, client.getAddress());
-//
-//        verify(clientRepository, times(1)).findById(clientId);
-//        verify(addressRepository, times(1)).findById(addressId);
-//        verify(clientRepository, times(1)).save(client);
-//    }
+        Client client = new Client();
+        Address address = new Address();
 
-//    @Test
-//     void testSetAddress_ClientNotFound() {
-//         Arrange
-//        Long clientId = 1L;
-//        Long addressId = 2L;
-//
-//        when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
+        when(addressRepository.findById(addressId)).thenReturn(Optional.of(address));
+        when(clientRepository.save(any(Client.class))).thenReturn(client);
 
-    // Act
-//        Optional<Client> result = clientService.setAddress(clientId, addressId);
+        Optional<Client> result = clientService.setAddress(clientId, addressId);
+        assertEquals(client, result.get());
 
-    // Assert
-//        assertFalse(result.isPresent());
-//        verify(clientRepository, times(1)).findById(clientId);
-//        verifyNoInteractions(addressRepository);
-//        verifyNoInteractions(clientRepository.save(any(Client.class)));
-//    }
+        assertEquals(address, client.getAddress());
 
-//    @Test
-//     void testSetAddress_AddressNotFound() {
-    // Arrange
-//        Long clientId = 1L;
-//        Long addressId = 2L;
-//
-//        Client client = new Client();
-//
-//        when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
-//        when(addressRepository.findById(addressId)).thenReturn(Optional.empty());
+        verify(clientRepository, times(1)).findById(clientId);
+        verify(addressRepository, times(1)).findById(addressId);
+        verify(clientRepository, times(1)).save(client);
+    }
 
-    // Act
-//        Optional<Client> result = clientService.setAddress(clientId, addressId);
-//
-    // Assert
-//        assertFalse(result.isPresent());
-//        assertNull(client.getAddress());
-//        verify(clientRepository, times(1)).findById(clientId);
-//        verify(addressRepository, times(1)).findById(addressId);
-//        verifyNoInteractions(clientRepository.save(any(Client.class)));
-//    }
+    @Test
+    void testSetAddress_clientNotFound() {
+        Long clientId = 1L;
+        Long addressId = 2L;
 
+        when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+
+        Optional<Client> result = clientService.setAddress(clientId, addressId);
+
+        assertFalse(result.isPresent());
+        verify(clientRepository, times(1)).findById(clientId);
+        verify(clientRepository, never()).save(any(Client.class));
+    }
+
+
+    @Test
+    void testSetAddress_addressNotFound() {
+        Long clientId = 1L;
+        Long addressId = 2L;
+
+        Client client = new Client();
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
+        when(addressRepository.findById(addressId)).thenReturn(Optional.empty());
+
+        Optional<Client> result = clientService.setAddress(clientId, addressId);
+
+        assertFalse(result.isPresent());
+        assertNull(client.getAddress());
+        verify(clientRepository, times(1)).findById(clientId);
+        verify(addressRepository, times(1)).findById(addressId);
+        verify(clientRepository, never()).save(any(Client.class));
+    }
+
+
+    @Test
+    void disconnectEntitiesClientAddress_clientFound() {
+        Long clientId = 1L;
+        Client client = new Client();
+        Address address = new Address();
+        client.setAddress(address);
+        address.setClient(client);
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
+
+        clientService.disconnectEntitiesClientAddress(clientId);
+
+        assertNull(client.getAddress());
+        assertNull(address.getClient());
+
+        verify(clientRepository, times(1)).findById(clientId);
+        verify(addressRepository, times(1)).save(address);
+        verify(clientRepository, times(1)).save(client);
+    }
+
+    @Test
+    void testDisconnectEntitiesClientAddress_clientNotFound() {
+        Long clientId = 1L;
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> {
+            clientService.disconnectEntitiesClientAddress(clientId);
+        });
+
+        verify(clientRepository, times(1)).findById(clientId);
+        verifyNoMoreInteractions(addressRepository, clientRepository);
+    }
+
+    @Test
+    void setPurchase_clientFound() {
+        Long clientId = 1L;
+        Long purchaseId = 2L;
+        Client client = new Client();
+        Purchase purchase = new Purchase();
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
+        when(purchaseRepository.findById(purchaseId)).thenReturn(Optional.of(purchase));
+        when(purchaseRepository.save(any(Purchase.class))).thenReturn(purchase);
+
+        Optional<Purchase> result = clientService.setPurchase(clientId, purchaseId);
+
+        assertTrue(result.isPresent());
+        assertEquals(purchase, result.get());
+        assertEquals(client, purchase.getClient());
+
+        verify(clientRepository, times(1)).findById(clientId);
+        verify(purchaseRepository, times(1)).findById(purchaseId);
+        verify(purchaseRepository, times(1)).save(purchase);
+    }
+
+    @Test
+    void testSetPurchase_clientNotFound() {
+        Long clientId = 1L;
+        Long purchaseId = 2L;
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+        when(purchaseRepository.findById(purchaseId)).thenReturn(Optional.empty());
+
+        Optional<Purchase> result = clientService.setPurchase(clientId, purchaseId);
+
+        assertFalse(result.isPresent());
+
+        verify(clientRepository, times(1)).findById(clientId);
+        verify(purchaseRepository, times(1)).findById(purchaseId);
+        verify(purchaseRepository, never()).save(any(Purchase.class));
+    }
+
+
+    @Test
+    void disconnectEntitiesPurchaseClient_purchaseFound() {
+        Long purchaseId = 1L;
+        Client client = new Client();
+        Purchase purchase = new Purchase();
+        client.setPurchases(List.of(purchase));
+        purchase.setClient(client);
+
+        when(purchaseRepository.findById(purchaseId)).thenReturn(Optional.of(purchase));
+
+        clientService.disconnectEntitiesPurchaseClient(purchaseId);
+
+        assertNull(client.getPurchases());
+        assertNull(purchase.getClient());
+
+        verify(purchaseRepository, times(1)).findById(purchaseId);
+        verify(clientRepository, times(1)).save(client);
+        verify(purchaseRepository, times(1)).save(purchase);
+    }
+
+
+    @Test
+    void disconnectWithAllEntities_clientFound() {
+        Long clientId = 1L;
+        Client client = new Client("Jane", "Doe", "j@d.pl", null, anyList());
+        Address address = new Address("Nice", "New York", "22-333", null);
+        Purchase purchase1 = new Purchase(LocalDateTime.now(), null, null);
+        Purchase purchase2 = new Purchase(LocalDateTime.now(), null, null);
+        Purchase purchase3 = new Purchase(LocalDateTime.now(), null, null);
+        List<Purchase> purchases = List.of(purchase1, purchase2, purchase3);
+
+        client.setId(clientId);
+        client.setAddress(address);
+        client.setPurchases(purchases);
+
+        when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
+
+        clientService.disconnectWithAllEntities(clientId);
+
+        verify(clientRepository, times(1)).save(client);
+        verify(addressRepository, times(1)).save(address);
+        for (Purchase purchase : purchases) {
+            verify(purchaseRepository, times(1)).save(purchase);
+            assertNull(purchase.getClient());
+        }
+        assertNull(client.getAddress());
+        assertNull(client.getPurchases());
+    }
 
 }
 

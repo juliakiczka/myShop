@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.Purchase;
 import com.example.demo.service.ClientService;
 import com.example.demo.service.PurchaseService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,7 +50,7 @@ public class PurchaseController {
             return ResponseEntity.notFound().build();
         }
         if (purchaseService.getPurchaseById(id).get().getClient() != null) {
-            clientService.disconnectEntitiesClientPurchase(purchaseService.getPurchaseById(id).get().getClient().getId());
+            clientService.disconnectEntitiesPurchaseClient(purchaseService.getPurchaseById(id).get().getClient().getId());
         }
         log.info("deleting purchase with id {}", id);
         purchaseService.removePurchaseById(id);

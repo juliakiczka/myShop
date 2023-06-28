@@ -110,7 +110,7 @@ public class ClientService {
         return Optional.empty();
     }
 
-    public void disconnectEntitiesClientPurchase(Long purchaseId) {
+    public void disconnectEntitiesPurchaseClient(Long purchaseId) {
         Purchase purchase = purchaseRepository.findById(purchaseId).orElse(null);
         if (purchase != null) {
             Client client = purchase.getClient();

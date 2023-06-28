@@ -1,6 +1,9 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,12 +15,17 @@ import java.util.List;
 @Data
 @Entity
 @NoArgsConstructor
+
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotEmpty(message = "Name field cannot be empty!")
     private String name;
+    @NotEmpty(message = "Surname field cannot be empty!")
     private String surname;
+//    @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+    @Email
     private String email;
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "address_id")
@@ -38,7 +46,7 @@ public class Client {
 //    3)przypisanie orderu dla klienta --- działa!
 //    4)zamiana orderu dla klienta --- metoda changeOrder
 //    5)usunięcie orderu, który ma klienta --- usuwa sie order a klient zostaje
-//    5)usunięcie klienta, który ma order --- kiedy usuwam klienta to order też sie usuwa
+//    5)usunięcie klienta, który ma order --- kiedy usuwam klienta to order też sie usuwa ---- DORÓB METODE!
 //
 
 }

@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.model.Product;
 import com.example.demo.model.Product;
+import com.example.demo.model.Purchase;
 import com.example.demo.repository.JpaProductRepository;
 import com.example.demo.repository.JpaPurchaseRepository;
 import org.junit.jupiter.api.Assertions;
@@ -12,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +32,7 @@ class ProductServiceTest {
     private JpaPurchaseRepository purchaseRepository;
 
     @BeforeEach
-     void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
@@ -46,7 +49,7 @@ class ProductServiceTest {
     }
 
     @Test
-     void saveProduct_should_add_and_return_new_product() {
+    void saveProduct_should_add_and_return_new_product() {
         Product product = new Product();
         Mockito.when(productRepository.existsById(Mockito.anyLong())).thenReturn(false);
         Mockito.when(productRepository.save(Mockito.any(Product.class))).thenReturn(product);
@@ -58,7 +61,7 @@ class ProductServiceTest {
     }
 
     @Test
-     void getProductById_should_return_product() {
+    void getProductById_should_return_product() {
         Product product = new Product();
         Mockito.when(productRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(product));
 
@@ -70,8 +73,7 @@ class ProductServiceTest {
 
 
     @Test
-
-     void removeProductById_should_delete_product() {
+    void removeProductById_should_delete_product() {
         Long productId = 1L;
         Product productToRemove = new Product();
         productToRemove.setId(productId);
@@ -85,7 +87,7 @@ class ProductServiceTest {
 
 
     @Test
-     void updateProductById_whenProductExists_should_return_updated_product() {
+    void updateProductById_whenProductExists_should_return_updated_product() {
         Long productId = 1L;
         Product existingProduct = new Product();
         existingProduct.setId(productId);
@@ -104,7 +106,7 @@ class ProductServiceTest {
     }
 
     @Test
-     void updateProductById_whenProductDoesNotExist_should_return_Empty_Optional() {
+    void updateProductById_whenProductDoesNotExist_should_return_Empty_Optional() {
         Long productId = 1L;
         Product updatedProduct = new Product();
         updatedProduct.setId(productId);
@@ -119,6 +121,20 @@ class ProductServiceTest {
     }
 
     @Test
-    void setOrders() {
+    void setPurchases_should_connect_product_with_purchase() {
+        Long productId = 1L;
+        Long purchaseId = 1L;
+        Product product = new Product("Coke", BigDecimal.valueOf(12.50), new ArrayList<>()); // Inicjalizacja listy purchases
+        Purchase purchase = new Purchase(LocalDateTime.now(), null, null);
+
+        Mockito.when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        Mockito.when(purchaseRepository.findById(purchaseId)).thenReturn(Optional.of(purchase));
+
+        Optional<Product> result = productService.setPurchases(productId, purchaseId);
+
+        Mockito.verify(productRepository, Mockito.times(1)).save(product);
+        assert(result.isPresent());
+        assert(result.get() == product);
     }
+
 }

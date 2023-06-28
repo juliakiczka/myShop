@@ -47,12 +47,12 @@ public class ProductService {
         return Optional.empty();
 
     }
-//      orders
-    public Optional<Product> setOrders(Long productId, Long orderId) {
+//      purchase
+    public Optional<Product> setPurchases(Long productId, Long purchaseId) {
         Optional<Product> product = repository.findById(productId);
-        Optional<Purchase> orders = purchaseRepository.findById(orderId);
-        if (product.isPresent() && orders.isPresent()) {
-            product.get().addOrder(orders.get());
+        Optional<Purchase> purchases = purchaseRepository.findById(purchaseId);
+        if (product.isPresent() && purchases.isPresent()) {
+            product.get().addOrder(purchases.get());
             repository.save(product.get());
             return product;
         }

@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Product;
 import com.example.demo.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,7 +51,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> post(@RequestBody Product product) {
+    public ResponseEntity<Product> post(@Valid @RequestBody Product product) {
         Optional<Product> savedClient = productService.saveProduct(product);
         if (savedClient.isPresent()) {
             return ResponseEntity
@@ -62,7 +63,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
+    ResponseEntity<Product> update(@PathVariable Long id,@Valid @RequestBody Product product) {
         Optional<Product> updatedProduct = productService.updateProductById(id, product);
         if (!updatedProduct.isEmpty()) {
             return ResponseEntity
@@ -77,7 +78,8 @@ public class ProductController {
     //  popraw endpointy
     @PatchMapping("/{productId}/connectWithPurchase/{purchaseId}")
     ResponseEntity<Product> patchProductWithPurchase(@PathVariable("productId") Long productId, @PathVariable("purchaseId") Long purchaseId) {
-        Optional<Product> product = productService.setOrders(productId, purchaseId);
+        Optional<Product> product = productService.setPurchases(
+                productId, purchaseId);
         if (product.isPresent()) {
             return ResponseEntity.status(HttpStatus.CREATED).body(product.get());
         }

@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Product;
 import com.example.demo.model.Purchase;
 import com.example.demo.repository.JpaProductRepository;
 import com.example.demo.repository.JpaPurchaseRepository;
@@ -13,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +24,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class PurchaseServiceTest {
-    @InjectMocks 
+    @InjectMocks
     private PurchaseService purchaseService;
     @Mock
     private JpaPurchaseRepository purchaseRepository;
     @Mock
     private JpaProductRepository productRepository;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -70,7 +73,6 @@ class PurchaseServiceTest {
 
 
     @Test
-
     void removePurchaseById_should_delete_purchase() {
         Long purchaseId = 1L;
         Purchase purchaseToRemove = new Purchase();
@@ -120,6 +122,22 @@ class PurchaseServiceTest {
 
 
     @Test
-    void setPurchase() {
+    void setProducts_should_connect_purchase_with_product() {
+        Long productId = 1L;
+        Long purchaseId = 1L;
+        Product product = new Product("Coke", BigDecimal.valueOf(12.50), null);
+        Purchase purchase = new Purchase(LocalDateTime.now(), null, new ArrayList<>());
+
+        Mockito.when(purchaseRepository.findById(purchaseId)).thenReturn(Optional.of(purchase));
+        Mockito.when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+
+        Optional<Purchase> result = purchaseService.setProducts(purchaseId, productId);
+
+        Mockito.verify(productRepository, Mockito.times(1)).findById(productId);
+        Mockito.verify(purchaseRepository, Mockito.times(1)).findById(purchaseId);
+        Mockito.verify(purchaseRepository, Mockito.times(1)).save(purchase);
+
+        assertTrue(result.isPresent());
+        assertEquals(purchase, result.get());
     }
 }
