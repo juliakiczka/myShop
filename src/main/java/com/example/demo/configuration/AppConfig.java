@@ -14,7 +14,7 @@
 //import org.springframework.security.provisioning.UserDetailsManager;
 //import org.springframework.security.web.SecurityFilterChain;
 //
-//@Configuration// adnotacja do tworzenia beanów
+//@Configuration
 //@EnableWebSecurity
 //public class AppConfig {
 //    @Bean
@@ -22,49 +22,36 @@
 //        return new InMemoryUserDetailsManager();
 //    }
 //
-////    @Bean
-////    InitializingBean initializingBean(UserDetailsManager userDetailsManager) {
-////        return () -> {
-////            UserDetails jk = User
-////                    .builder()
-////                    .passwordEncoder(password -> PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
-////                    .password("maslo")
-////                    .roles("User")
-////                    .username("jk")
-////                    .build();
-////            userDetailsManager.createUser(jk);
-////            UserDetails admin = User
-////                    .builder()
-////                    .passwordEncoder(password -> PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
-////                    .password("password")
-////                    .roles("Admin")
-////                    .username("admin")
-////                    .build();
-////            userDetailsManager.createUser(admin);
-////        };
+//    @Bean
+//    InitializingBean initializingBean(UserDetailsManager userDetailsManager) {
+//        return () -> {
+//            UserDetails jk = User
+//                    .builder()
+//                    .passwordEncoder(password -> PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
+//                    .password("maslo")
+//                    .roles("USER")
+//                    .username("jk")
+//                    .build();
+//            userDetailsManager.createUser(jk);
+//        };
+//    }
+//
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+//        httpSecurity
+//                .httpBasic()
+//                .and()
+//                .formLogin()
+//                .and()
+//                .logout();
+//        httpSecurity
+//                .sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//        httpSecurity
+//                .authorizeRequests()
+//                .antMatchers(HttpMethod.GET, "/your-endpoint").hasRole("USER") // Dostęp do żądania GET tylko dla użytkowników z rolą "USER"
+//                .anyRequest()
+//                .authenticated();
+//        return httpSecurity.build();
 ////    }
-////
-////    @Bean
-////    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-////        httpSecurity
-////                .httpBasic()
-////                .and()
-////                .formLogin()
-////                .and()
-////                .logout();
-////        httpSecurity
-////                .sessionManagement()
-////                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-////        todo fix this and commit
-////        httpSecurity
-////                .authorizeHttpRequests()
-////                .requestMatchers(HttpMethod.POST,"/questions/submit")
-////                .hasRole("Admin")
-////                .anyRequest()
-////                .authenticated();
-////        return httpSecurity
-////                .build();
-////    }
-////
-////
 //}
